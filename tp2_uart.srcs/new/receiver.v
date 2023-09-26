@@ -3,15 +3,16 @@
 module receiver#(
     parameter NB_DATA = 8
 )(
-    input wire i_rx,
-    input wire i_tick,
-    input wire i_clock,
-    input wire i_reset,
-    output wire [NB_DATA-1:0] o_rx_data,
-    output wire o_rx_done
+    input wire i_rx, //pin de entrada para recibir los datos en serie
+    input wire i_tick, //Contador de tics [0:7] definiendo datos de 8 bits de largo
+    input wire i_clock, 
+    input wire i_reset, 
+    output wire [NB_DATA-1:0] o_rx_data, //Dato de entrada paralelizado
+    output wire o_rx_done //Flag de fin de conversion
 );
-//4 estados, sin bit partidad, 1 solo bit de stop 
-localparam IDLE_STATE =     4'b0001;
+
+/* Definimos 4 estados, sin bit partidad, 1 solo bit de stop. */
+localparam IDLE_STATE =     4'b0001; //El receptor espera datos, Bit de start = 0.
 localparam START_STATE =    4'b0010;
 localparam DATA_STATE =     4'b0100;
 localparam STOP_STATE =     4'b1000;

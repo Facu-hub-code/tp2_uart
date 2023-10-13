@@ -31,8 +31,8 @@ begin
         OP_AND    : result = i_dato_A & i_dato_B;
         OP_OR     : result = i_dato_A | i_dato_B;
         OP_XOR    : result = i_dato_A ^ i_dato_B;
-        OP_SRA    : result = {i_dato_A[NB_DATA-1],i_dato_A[NB_DATA-1:1]};
-        OP_SRL    : result = i_dato_A >> 1;
+        OP_SRA    : result = i_dato_A >>> i_dato_B;
+        OP_SRL    : result = i_dato_A >> i_dato_B;
         OP_NOR    : result = ~(i_dato_A | i_dato_B);
         default   : result = i_dato_A + i_dato_B;
     endcase

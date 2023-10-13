@@ -3,26 +3,25 @@
 module receiver#(
     parameter NB_DATA = 8
 )(
-    input wire i_rx, //pin de entrada para recibir los datos en serie
+    input wire i_rx,
     input wire i_tick,
-    input wire i_clock, 
-    input wire i_reset, 
-    output wire [NB_DATA-1:0] o_rx_data, //Dato de entrada paralelizado
-    output wire o_rx_done //Flag de fin del muestreo
+    input wire i_clock,
+    input wire i_reset,
+    output wire [NB_DATA-1:0] o_rx_data,
+    output wire o_rx_done
 );
-
-/* Definimos 4 estados, sin bit partidad, 1 solo bit de stop. */
-localparam IDLE_STATE =     4'b0001; //El receptor espera datos, Bit de start = 0.
-localparam START_STATE =    4'b0010; //Bit de start = 1. y tics cuenta hasta 7.
-localparam DATA_STATE =     4'b0100; // Bit de start = 0, tics cada 15 y data < 7.
-localparam STOP_STATE =     4'b1000; //Bit de stop = 1.
+//4 estados, sin bit partidad, 1 solo bit de stop 
+localparam IDLE_STATE =     4'b0001;
+localparam START_STATE =    4'b0010;
+localparam DATA_STATE =     4'b0100;
+localparam STOP_STATE =     4'b1000;
 
 localparam NB_STATES = 4;
 reg [NB_STATES-1:0] state;
 reg [NB_STATES-1:0] next_state;
 
 //contador de ticks, maxima cuenta hasta 15
-localparam NB_TICK_COUNTER = 4;
+localparam NB_TICK_COUNTER = 4; 
 reg [NB_TICK_COUNTER-1:0] tick_counter,next_tick_counter;
 
 //contador de data recibida, maximo hasta 7
@@ -38,7 +37,7 @@ reg rx_done, next_rx_done;
 always@(posedge i_clock)
 begin
     if(i_reset)
-        state <= IDLE_STATE; //El estado de inicio es IDLE
+        state <= IDLE_STATE;
     else
         state <= next_state;
 end
@@ -47,12 +46,12 @@ end
 always@(posedge i_clock)
 begin
     if(i_reset)
-        tick_counter <= {NB_TICK_COUNTER{1'b0}}; //Concatena 0s y limpia el contador de tics
+        tick_counter <= {NB_TICK_COUNTER{1'b0}};
     else 
         tick_counter <= next_tick_counter;
 end
 
-//Contador de datos
+//contador de datos
 always@(posedge i_clock)
 begin
     if(i_reset)
@@ -88,7 +87,7 @@ begin
             next_data = {NB_DATA{1'b0}};
             next_tick_counter = {NB_TICK_COUNTER{1'b0}};
             next_data_counter = {NB_DATA_COUNTER{1'b0}};
-            if(i_rx == 0) //Cuando llega un bajo en i_rx significa START
+            if(i_rx == 0)
                 next_state = START_STATE;
             else
                 next_state = IDLE_STATE;
@@ -99,21 +98,21 @@ begin
             begin
                 if(tick_counter == 4'b0111) //si el contador de ticks es igual a 8, mitad del START
                 begin
-                    if(i_rx == 0) 
+                    if(i_rx == 0)
                     begin
-                        next_state = DATA_STATE; //Te vas al estado de datos
-                        next_tick_counter = {NB_TICK_COUNTER{1'b0}}; //Limpias el contador de tics
+                        next_state = DATA_STATE;
+                        next_tick_counter = {NB_TICK_COUNTER{1'b0}};
                     end 
                     else 
                         next_state = IDLE_STATE;
                 end
                 else
                 begin
-                    next_tick_counter = tick_counter + 1; //Aumentas un tic
-                    next_state = START_STATE; //Te quedas en start
+                    next_tick_counter = tick_counter + 1;
+                    next_state = START_STATE;
                 end
             end
-            else //y sino, no paso nada
+            else
             begin
                 next_state = START_STATE;
                 next_tick_counter = tick_counter;
@@ -172,7 +171,7 @@ begin
             end                
         end
         default:
-            next_state = IDLE_STATE; //Por las dudas
+            next_state = IDLE_STATE;
     endcase              
 end
 
